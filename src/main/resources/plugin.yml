@@ -1,0 +1,4 @@
+name: HCF
+version: '${project.version}'
+main: com.github.spook.hcf.HCF
+api-version: 1.19
