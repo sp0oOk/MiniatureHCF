@@ -1,4 +1,5 @@
-name: HCF
+name: MiniatureHCF
 version: '${project.version}'
-main: com.github.spook.hcf.HCF
-api-version: 1.19
+main: com.miniaturecraft.hcf.HCF
+api-version: 1.8.8
+depend: [MiniatureCore]
