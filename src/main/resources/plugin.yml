@@ -3,3 +3,4 @@ version: '${project.version}'
 main: com.miniaturecraft.hcf.HCF
 api-version: 1.8.8
 depend: [MiniatureCore]
+softdepend: [LuckPerms, ProtocolLib]

@@ -1,33 +1,61 @@
 package com.miniaturecraft.hcf.configs;
 
-import com.google.common.collect.Lists;
-import com.miniaturecraft.hcf.objects.Faction;
-import com.miniaturecraft.hcf.objects.FactionParticipator;
 import com.miniaturecraft.miniaturecore.interfaces.Config;
 import com.miniaturecraft.miniaturecore.objects.MiniatureList;
-import com.miniaturecraft.miniaturecore.objects.MiniatureMap;
-import com.miniaturecraft.miniaturecore.objects.ParsedPlaceholders;
-import org.bukkit.entity.Player;
-
-import java.util.List;
 
 @Config(name = "lang")
 @SuppressWarnings("unused")
 public class HCFConfig {
 
   // ----------------------------------------- //
-  // FIELDS
+  // GENERAL OPTIONS
   // ----------------------------------------- //
+
+  public String factionExists = "&cA faction with that name already exists.";
+  public String factionCreated = "&aYou have created the faction &e{faction_name}&a.";
+  public String factionAlreadyInFaction = "&cYou are already in a faction.";
+
+  // ----------------------------------------- //
+  // DEFAULT SYSTEM FACTIONS (DO NOT TOUCH)
+  // ----------------------------------------- //
+  public String warzoneName = "Warzone";
+  public String warzoneDescription = "Not the safest place to be.";
+  public String safezoneName = "Safezone";
+  public String safezoneDescription = "The safest place to be.";
+  public String wildernessName = "Wilderness";
+  public String wildernessDescription = "A place for everyone.";
+  public String roadName = "Road";
+  public String roadDescription = "/road for more info.";
+
+  public String factionNameRegex = "[a-zA-Z0-9]{3,16}";
+  public String factionNameRegexMessage =
+      "&cFaction names must be between 3 and 16 characters long.";
+  public boolean factionNameBlacklistEnabled = true;
+  public String factionNameBlacklistMessage =
+      "&cFaction names cannot contain some of the words you provided.";
+  public MiniatureList<String> factionNameBlacklist =
+      MiniatureList.create("bitch", "nigger", "nigga", "cunt");
 
   public int maxFactionMembers = 5;
 
-  public MiniatureMap<String, String> messages =
-      MiniatureMap.create(
-          "noFactionPresent", "&7You are not on a team!",
-          "factionCreated", "&eTeam &6{faction_name} &ehas been &acreated &eby {player_name}&e");
+  // ----------------------------------------- //
+  // FACTION LEAVE OPTIONS
+  // ----------------------------------------- //
 
-  public List<String> fWhoMessage =
-      Lists.newArrayList(
+  public String fLeave = "&eYou have left the team &6{faction_name}&e.";
+  public String fLeaveOther = "&e{player_name} &ehas left the team &6{faction_name}&e.";
+  public boolean fLeaveBroadcast = true;
+  public MiniatureList<String> fLeaveCommandFailed =
+      MiniatureList.create(
+          "&cYou cannot leave your current team!",
+          "&7Note: This is either because you are the leader, or you are the only member.");
+
+  // ----------------------------------------- //
+  // FACTION WHO OPTIONS
+  // ----------------------------------------- //
+
+  public MiniatureList<String> fWhoMessage =
+      MiniatureList.create(
           "&7&m-------------------------------------",
           "&9{faction_name} &7[{online_members}/{max_members}] &3- &eHQ: &6{faction_home}",
           "&eLeader: {rel_color}{faction_leader}&e[{kdr_colored_leader}&e]",
@@ -38,25 +66,7 @@ public class HCFConfig {
           "&eCrystals: &c{faction_crystals}",
           "&7&m-------------------------------------");
 
-  public MiniatureList<String> parseFWho(Faction faction, FactionParticipator viewer) {
-    return ParsedPlaceholders.parse(
-            fWhoMessage,
-            k -> {
-              switch (k) {
-                case "faction_name":
-                  return faction.getName();
-                case "online_members":
-                  return faction.getOnlineMembers().size() + "";
-                case "max_members":
-                  return faction.getMaxMembers() + "";
-                case "rel_color":
-                  return faction.getRelationTo(viewer).getColour() + "";
-                case "faction_leader":
-                  return faction.getLeader().map(Player::getName).orElse("Console");
-                default:
-                  return null;
-              }
-            })
-        .unwrapAll();
-  }
+  // ----------------------------------------- //
+  // OTHER OPTIONS
+  // ----------------------------------------- //
 }

@@ -1,11 +1,11 @@
 package com.miniaturecraft.hcf.configs;
 
 import com.miniaturecraft.hcf.HCF;
+import com.miniaturecraft.hcf.enums.Role;
 import com.miniaturecraft.hcf.objects.Faction;
 import com.miniaturecraft.hcf.objects.FactionParticipator;
-import com.miniaturecraft.hcf.enums.Role;
 import com.miniaturecraft.miniaturecore.interfaces.Config;
-import com.miniaturecraft.miniaturecore.objects.UniqueList;
+import com.miniaturecraft.miniaturecore.objects.MiniatureList;
 import org.bukkit.entity.Player;
 
 import java.util.UUID;
@@ -17,8 +17,8 @@ public class FactionsConfig {
   // FIELDS
   // ----------------------------------------- //
 
-  public UniqueList<Faction> factions = UniqueList.create();
-  public UniqueList<FactionParticipator> factionParticipators = UniqueList.create();
+  public MiniatureList<Faction> factions = MiniatureList.create();
+  public MiniatureList<FactionParticipator> factionParticipators = MiniatureList.create();
 
   /**
    * Get a faction by its name("tag")
@@ -53,18 +53,41 @@ public class FactionsConfig {
     return factions.stream()
         .filter(
             faction ->
-                faction.getMembers().stream().anyMatch(member -> member.getId().equals(uuid)))
+                faction.getFMembers().stream().anyMatch(member -> member.getId().equals(uuid)))
         .findFirst()
         .orElse(null);
   }
 
   /** Creates system factions */
   public void createSystemFactions() {
-    if (factions.add(Faction.create(HCF.WILDERNESS_ID, null, "Wilderness", "The Wilderness"))
-        || factions.add(Faction.create(HCF.WARZONE_ID, null, "Warzone", "Not a safe place to be."))
-        || factions.add(Faction.create(HCF.SAFEZONE_ID, null, "Safezone", "A safe place to be."))
-        || factions.add(Faction.create(HCF.ROAD_ID, null, "Road", "A place to walk."))) {
+    int addedCount = 0;
+    final HCFConfig config = HCF.get().getConf();
+    for (int systemFaction :
+        MiniatureList.create(HCF.WILDERNESS_ID, HCF.SAFEZONE_ID, HCF.ROAD_ID, HCF.WARZONE_ID)) {
+      Faction faction = getFaction(systemFaction);
+      if (faction == null) {
+        if (systemFaction == HCF.WILDERNESS_ID) {
+          faction =
+              new Faction(
+                  systemFaction, null, config.wildernessName, config.wildernessDescription, true);
+        } else if (systemFaction == HCF.SAFEZONE_ID) {
+          faction =
+              new Faction(
+                  systemFaction, null, config.safezoneName, config.safezoneDescription, true);
+        } else if (systemFaction == HCF.ROAD_ID) {
+          faction = new Faction(systemFaction, null, config.roadName, config.roadDescription, true);
+        } else if (systemFaction == HCF.WARZONE_ID) {
+          faction =
+              new Faction(systemFaction, null, config.warzoneName, config.warzoneDescription, true);
+        }
+        factions.add(faction);
+        addedCount++;
+      }
+    }
+
+    if (addedCount > 0) {
       HCF.get().save(this);
+      HCF.get().log("<i>Added <h>" + addedCount + " <i>missing system factions.");
     }
   }
 
@@ -75,15 +98,9 @@ public class FactionsConfig {
    * @param name The name of the faction
    * @param description The description of the faction
    */
-  public Faction createFaction(UUID leader, String name, String description) {
-    final Faction faction = Faction.create(factions.size() + 1, leader, name, description);
-
-    if (leader == null) {
-      faction.setSystemFaction(true);
-    }
-
+  public Faction createFaction(UUID leader, String name, String description, boolean system) {
+    final Faction faction = new Faction(factions.size() + 1, leader, name, description, system);
     factions.add(faction);
-
     return faction;
   }
 
@@ -93,6 +110,8 @@ public class FactionsConfig {
    * @param faction The faction to delete
    */
   public void deleteFaction(Faction faction) {
+    // TODO: add logic to delete faction and all members in it
+
     factions.remove(faction);
   }
 
@@ -134,9 +153,9 @@ public class FactionsConfig {
     }
 
     FactionParticipator newParticipator =
-        FactionParticipator.create(playerId, player.getName(), wilderness, Role.MEMBER);
+        new FactionParticipator(playerId, player.getName(), HCF.WILDERNESS_ID);
     if (factionParticipators.add(newParticipator)) {
-      wilderness.getMembers().add(newParticipator);
+      wilderness.addMember(newParticipator, Role.MEMBER);
     }
   }
 }

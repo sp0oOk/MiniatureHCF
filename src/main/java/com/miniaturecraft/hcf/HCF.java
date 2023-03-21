@@ -9,7 +9,7 @@ public class HCF extends MiniaturePlugin {
 
   // ----------------------------------------- //
   // FIELDS
-  // ----------------------------------------- //
+  // ----------------------------------------- //`
 
   public static int WILDERNESS_ID = 0;
   public static int WARZONE_ID = 1;
@@ -33,9 +33,9 @@ public class HCF extends MiniaturePlugin {
   @Override
   public void onEnableInner() {
     i = this;
+    hcfConfig = getConfig(HCFConfig.class);
     factionsConfig = getConfig(FactionsConfig.class);
     factionsConfig.createSystemFactions();
-    hcfConfig = getConfig(HCFConfig.class);
     registerListener(new PlayerJoiningListener());
   }
 

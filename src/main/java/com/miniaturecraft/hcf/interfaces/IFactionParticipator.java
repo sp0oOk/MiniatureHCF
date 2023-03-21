@@ -1,6 +1,5 @@
 package com.miniaturecraft.hcf.interfaces;
 
-import com.miniaturecraft.hcf.enums.Role;
 import com.miniaturecraft.hcf.objects.Faction;
 
 import java.util.Optional;
@@ -14,7 +13,17 @@ public interface IFactionParticipator {
 
   Optional<Faction> getFaction();
 
-  Role getRole();
-
   boolean isOnline();
+
+  boolean isBypassing();
+
+  boolean changeBypassing();
+
+  int getKills();
+
+  int getDeaths();
+
+  int getAssists();
+
+  float getKDR();
 }
