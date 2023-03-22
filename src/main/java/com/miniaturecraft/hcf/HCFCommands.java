@@ -1,7 +1,6 @@
 package com.miniaturecraft.hcf;
 
 import com.miniaturecraft.hcf.enums.Role;
-import com.miniaturecraft.hcf.integration.IntegrationProtocolLib;
 import com.miniaturecraft.hcf.objects.Faction;
 import com.miniaturecraft.hcf.objects.FactionParticipator;
 import com.miniaturecraft.miniaturecore.commands.CommandArgs;
@@ -12,7 +11,6 @@ import com.miniaturecraft.miniaturecore.interfaces.commands.SubCommand;
 import com.miniaturecraft.miniaturecore.objects.ParsedPlaceholders;
 import com.miniaturecraft.miniaturecore.requirements.TypeRequirement;
 import com.miniaturecraft.miniaturecore.utils.Txt;
-import org.bukkit.Material;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
@@ -80,7 +78,7 @@ public class HCFCommands {
                 isPlayer ? ((Player) sender).getUniqueId() : null,
                 name,
                 "No description",
-                isPlayer);
+                !isPlayer);
 
     // Get parsed placeholders.
     final ParsedPlaceholders placeholders = Utils.getSelfPlaceholders(participator);
@@ -92,7 +90,7 @@ public class HCFCommands {
     }
 
     // Send a message to the sender. (Faction created)
-    sender.sendMessage(Txt.parse(placeholders.parse(HCF.get().getConf().factionCreated)));
+    sender.sendMessage(placeholders.parse(HCF.get().getConf().factionCreated));
   }
 
   /**
@@ -124,6 +122,59 @@ public class HCFCommands {
     placeholders.parse(HCF.get().getConf().fLeaveCommandFailed).send(sender);
   }
 
+  @SubCommand(
+      name = "disband",
+      description = "Disbands your current faction.",
+      permission = "hcf.command.faction.disband",
+      args = {@Arg(name = "faction", req = false, type = TypeRequirement.STRING)})
+  public void onDisband(CommandSender sender, CommandArgs args) {
+    // Get the participator of the sender.
+    final FactionParticipator participator =
+        sender instanceof Player ? HCF.get().getFactionsHandler().getPlayer((Player) sender) : null;
+
+    // Name or null if not set.
+    final String name = args.read(null);
+
+    // If name is null and participator isn't null set the faction to the participators faction or
+    // else get the faction by name.
+    final Faction faction =
+        name == null && participator != null
+            ? participator.getFaction().orElse(null)
+            : HCF.get().getFactionsHandler().getFaction(name);
+
+    // If the faction still doesn't exist, send a message.
+    if (faction == null) {
+      sender.sendMessage(Txt.parse("&cFaction not found."));
+      return;
+    }
+
+    // If the faction is a system faction, send a message.
+    if (faction.isSystemFaction()) {
+      sender.sendMessage(Txt.parse("&cYou cannot disband system factions."));
+      return;
+    }
+
+    // Get the faction leader of X faction.
+    final FactionParticipator leader = faction.getFLeader().orElse(null);
+
+    // If the leader is null or the leader is null (should never reach, but some safety checks)
+    if (leader == null || participator == null) {
+      return; // This should never happen.
+    }
+
+    // If the leader isn't the sender, and they aren't bypassing, send a message.
+    if (leader.getId() != participator.getId() && !participator.isBypassing()) {
+      sender.sendMessage(Txt.parse("&cYou must be the leader of the faction to disband it."));
+      return;
+    }
+
+    // Disband the faction.
+    faction.disband(leader.getDisplayName());
+
+    // Send a message to the sender. (Faction disbanded)
+    sender.sendMessage(Txt.parse("&aSuccessfully disbanded the faction."));
+  }
+
   /**
    * Command /f who [faction] - Shows information about a faction.
    *
@@ -137,7 +188,7 @@ public class HCFCommands {
       permission = "hcf.command.faction.who",
       requirements = {Requirement.IS_PLAYER})
   public void onCommandWho(CommandSender sender, CommandArgs args) {
-    // TODO: re-add placeholders
+    // TODO: re-add args, when rethink of placeholers is done.
     // Get the sender as a player.
     final Player player = (Player) sender;
     // Get the participator of the sender.
@@ -149,15 +200,35 @@ public class HCFCommands {
   }
 
   @SubCommand(
+      name = "bypass",
+      description = "Administrative bypass command.",
+      permission = "hcf.command.faction.bypass",
+      requirements = {Requirement.IS_PLAYER})
+  public void onCommandBypass(CommandSender sender, CommandArgs args) {
+    final FactionParticipator participator =
+        HCF.get().getFactionsHandler().getPlayer((Player) sender);
+    participator.changeBypassing();
+    final String parsedStr =
+        Utils.getSelfPlaceholders(participator).parse(HCF.get().getConf().fBypassMessage);
+    sender.sendMessage(parsedStr);
+  }
+
+  @SubCommand(
+      name = "scoreboard",
+      alias = {"sb"},
+      description = "Toggle scoreboard state.",
+      permission = "hcf.command.faction.scoreboard",
+      requirements = {Requirement.IS_PLAYER})
+  public void onScoreboard(CommandSender sender, CommandArgs args) {
+    // TODO Implement this.
+  }
+
+  @SubCommand(
       name = "test",
       description = "Test command",
       permission = "hcf.command.faction.test",
       requirements = {Requirement.IS_PLAYER})
   public void onCommandTest(CommandSender sender, CommandArgs args) {
     final Player player = (Player) sender;
-    final IntegrationProtocolLib protocolLib =
-        HCF.get().getIntegration(IntegrationProtocolLib.class);
-    protocolLib.spawnFakeBlocks(player, player.getLocation(), 5, Material.DIAMOND, (byte) 0);
-    player.sendMessage("Spawned fake blocks.");
   }
 }

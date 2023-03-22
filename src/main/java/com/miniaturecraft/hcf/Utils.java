@@ -45,15 +45,21 @@ public class Utils {
     parsedPlaceholders.map(
         s -> {
           switch (s) {
+            case "player_name":
+              return participator != null ? participator.getDisplayName() : "?";
+            case "player_balance":
+              return "0"; // TODO: Economy Provider, Vault or internal.
+            case "player_kdr":
+              return "0.00"; // TODO: KDR
             case "faction_name":
               return faction.map(Faction::getName).orElse("None");
-            case "online_members":
+            case "faction_online_members":
               return faction.map(m -> m.getOnlineMembers().size()).orElse(0) + "";
-            case "max_members":
+            case "faction_max_members":
               return faction.map(Faction::getMaxMembers).orElse(0) + "";
             case "faction_home":
               return "None"; // TODO: I want to complete custom location wrapper in core.
-            case "rel_color":
+            case "faction_rel_color":
               return faction
                       .map(f -> f.getRelationTo(participator).getColour())
                       .orElse(ChatColor.WHITE)
@@ -62,7 +68,7 @@ public class Utils {
               return faction
                   .map(f -> f.getLeader().map(Player::getName).orElse("Console"))
                   .orElse("Console");
-            case "kdr_colored_leader":
+            case "faction_kdr_colored_leader":
               return faction
                       .map(
                           f ->
@@ -73,7 +79,7 @@ public class Utils {
                   + "";
             case "faction_balance":
               return faction.map(Faction::getBalance).orElse(0) + ""; // TODO: Format
-            case "dtr_colored_pretty":
+            case "faction_dtr_colored_pretty":
               return faction.map(Faction::getDTR).orElse(0.0D) + ""; // TODO: Format
             case "faction_points":
               return faction.map(Faction::getPoints).orElse(0) + "";
@@ -81,6 +87,10 @@ public class Utils {
               return faction.map(Faction::getKothsCaptured).orElse(0) + "";
             case "faction_crystals":
               return faction.map(Faction::getCrystals).orElse(0D) + "";
+            case "is_bypassing":
+              return participator != null && participator.isBypassing()
+                  ? ChatColor.GREEN + "are now"
+                  : ChatColor.RED + "are no longer";
             default:
               return null;
           }

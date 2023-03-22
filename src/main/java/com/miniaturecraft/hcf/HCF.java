@@ -2,7 +2,9 @@ package com.miniaturecraft.hcf;
 
 import com.miniaturecraft.hcf.configs.FactionsConfig;
 import com.miniaturecraft.hcf.configs.HCFConfig;
-import com.miniaturecraft.hcf.listeners.PlayerJoiningListener;
+import com.miniaturecraft.hcf.listeners.PlayerInteractingListener;
+import com.miniaturecraft.hcf.listeners.PlayerJQListener;
+import com.miniaturecraft.hcf.scoreboards.ScoreboardManager;
 import com.miniaturecraft.miniaturecore.MiniaturePlugin;
 
 public class HCF extends MiniaturePlugin {
@@ -19,6 +21,7 @@ public class HCF extends MiniaturePlugin {
   private static HCF i;
   private FactionsConfig factionsConfig;
   private HCFConfig hcfConfig;
+  private ScoreboardManager scoreboardManager;
 
   /**
    * Our cute plugin instance
@@ -36,7 +39,9 @@ public class HCF extends MiniaturePlugin {
     hcfConfig = getConfig(HCFConfig.class);
     factionsConfig = getConfig(FactionsConfig.class);
     factionsConfig.createSystemFactions();
-    registerListener(new PlayerJoiningListener());
+    scoreboardManager = new ScoreboardManager();
+    registerListener(new PlayerJQListener());
+    registerListener(new PlayerInteractingListener());
   }
 
   /** Called when the plugin is disabled */
@@ -63,5 +68,14 @@ public class HCF extends MiniaturePlugin {
    */
   public HCFConfig getConf() {
     return hcfConfig;
+  }
+
+  /**
+   * Get the scoreboard manager
+   *
+   * @return The scoreboard manager
+   */
+  public ScoreboardManager getScoreboardManager() {
+    return scoreboardManager;
   }
 }

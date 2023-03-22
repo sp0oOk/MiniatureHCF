@@ -12,11 +12,8 @@ import org.bukkit.block.BlockFace;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.FallingBlock;
 import org.bukkit.entity.Player;
-import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
-import org.bukkit.event.player.PlayerMoveEvent;
 import org.bukkit.metadata.FixedMetadataValue;
-import org.bukkit.scheduler.BukkitRunnable;
 
 @Integration(name = "ProtocolLib", className = "com.comphenix.protocol.ProtocolLibrary")
 @SuppressWarnings("unused")
@@ -39,17 +36,11 @@ public class IntegrationProtocolLib implements Listener {
     for (BlockFace face : BlockFace.values()) {
       Location blockLocation =
           center.clone().add(face.getModX() * radius, 0, face.getModZ() * radius);
-      fakeBlockPacket
-          .getDoubles()
-          .write(0, blockLocation.getX() + 0.5); // add 0.5 to center the block
+      fakeBlockPacket.getIntegers().write(1, (int) (blockLocation.getX() * 32)); // X position
+      fakeBlockPacket.getIntegers().write(2, (int) (blockLocation.getY() * 32)); // Y position
+      fakeBlockPacket.getIntegers().write(3, (int) (blockLocation.getZ() * 32)); // Z position
 
-      fakeBlockPacket
-          .getDoubles()
-          .write(1, blockLocation.getY() - 0.5); // subtract 0.5 to align with block surface
-
-      fakeBlockPacket.getDoubles().write(2, blockLocation.getZ() + 0.5);
-
-      fakeBlockPacket.getIntegers().write(1, 0); // no velocity
+      fakeBlockPacket.getIntegers().write(4, 0); // no velocity
 
       // Send packet to player
       try {
@@ -91,27 +82,6 @@ public class IntegrationProtocolLib implements Listener {
       ProtocolLibrary.getProtocolManager().sendServerPacket(player, destroyEntitiesPacket);
     } catch (Exception e) {
       e.printStackTrace();
-    }
-  }
-
-  // TEST CODE
-  @EventHandler
-  public void onPlayerMove(PlayerMoveEvent event) {
-    // Check if the player has moved a significant distance
-    if (event.getFrom().distance(event.getTo()) > 1) {
-      // Get the player and their current location
-      Player player = event.getPlayer();
-      Location location = player.getLocation();
-
-      spawnFakeBlocks(player, location, 5, Material.DIAMOND_BLOCK, (byte) 0);
-
-      // Remove the fake blocks after 5 seconds
-      new BukkitRunnable() {
-        @Override
-        public void run() {
-          removeFakeBlocks(player);
-        }
-      }.runTaskLater(HCF.get(), 100); // 20 ticks per second, so 100 ticks is 5 seconds
     }
   }
 }

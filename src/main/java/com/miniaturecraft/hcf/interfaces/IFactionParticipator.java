@@ -1,6 +1,7 @@
 package com.miniaturecraft.hcf.interfaces;
 
 import com.miniaturecraft.hcf.objects.Faction;
+import org.bukkit.entity.Player;
 
 import java.util.Optional;
 import java.util.UUID;
@@ -14,6 +15,10 @@ public interface IFactionParticipator {
   Optional<Faction> getFaction();
 
   boolean isOnline();
+
+  Optional<Player> getBukkitPlayer();
+
+  String getDisplayName();
 
   boolean isBypassing();
 

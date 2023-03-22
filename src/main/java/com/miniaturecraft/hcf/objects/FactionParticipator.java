@@ -61,6 +61,16 @@ public class FactionParticipator implements IFactionParticipator {
     return player != null && player.isOnline();
   }
 
+  @Override
+  public Optional<Player> getBukkitPlayer() {
+    return Optional.ofNullable(Bukkit.getPlayer(id));
+  }
+
+  @Override
+  public String getDisplayName() {
+    return getBukkitPlayer().map(Player::getDisplayName).orElse("Unknown");
+  }
+
   /** Returns whether the participator is bypassing. */
   @Override
   public boolean isBypassing() {

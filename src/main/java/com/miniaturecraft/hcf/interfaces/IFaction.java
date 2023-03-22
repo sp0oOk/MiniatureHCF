@@ -26,6 +26,8 @@ public interface IFaction {
 
   String description();
 
+  void disband(String leader);
+
   int getBalance();
 
   void setBalance(int balance);

@@ -108,10 +108,10 @@ public class FactionsConfig {
    * Deletes a faction
    *
    * @param faction The faction to delete
+   * @param save Whether to save the config (recommended as if server crashes, the faction will be
+   *     back if not saved)
    */
-  public void deleteFaction(Faction faction) {
-    // TODO: add logic to delete faction and all members in it
-
+  public void deleteFaction(Faction faction, boolean save) {
     factions.remove(faction);
   }
 

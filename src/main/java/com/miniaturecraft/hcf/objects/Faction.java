@@ -93,6 +93,29 @@ public class Faction implements IFaction {
     return description == null ? "No description" : description;
   }
 
+  @Override
+  public void disband(String leader) {
+    for (FactionParticipator participator : getFMembers()) {
+      if (!removeMember(participator)) {
+        HCF.get()
+            .log(
+                "<yellow>Failed to remove member <white>"
+                    + participator.getName()
+                    + "<yellow> from faction <white>"
+                    + getName()
+                    + "<yellow>.");
+      }
+    }
+    HCF.get().getFactionsHandler().deleteFaction(this, true);
+    HCF.get()
+        .log(
+            "<yellow>Faction <white>"
+                + getName()
+                + "<yellow> has been disbanded by <white>"
+                + leader
+                + "<yellow>.");
+  }
+
   /** Returns the faction balance. */
   @Override
   public int getBalance() {
