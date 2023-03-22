@@ -1,11 +1,15 @@
 package com.miniaturecraft.hcf.interfaces;
 
+import com.miniaturecraft.hcf.enums.ClaimResult;
 import com.miniaturecraft.hcf.enums.Role;
 import com.miniaturecraft.hcf.objects.Faction;
 import com.miniaturecraft.hcf.objects.FactionParticipator;
 import com.miniaturecraft.hcf.enums.Relation;
+import com.miniaturecraft.hcf.objects.PendingInvitation;
+import com.miniaturecraft.miniaturecore.objects.MiniatureList;
 import com.miniaturecraft.miniaturecore.objects.MiniatureMap;
 import com.miniaturecraft.miniaturecore.objects.Pair;
+import com.miniaturecraft.miniaturecore.objects.QL;
 import org.bukkit.entity.Player;
 
 import java.util.List;
@@ -25,6 +29,14 @@ public interface IFaction {
   String getName();
 
   String description();
+
+  MiniatureList<QL> getClaims();
+
+  boolean isClaimed(QL location);
+
+  ClaimResult claim(QL location, FactionParticipator factionParticipator);
+
+  Optional<QL> getHome();
 
   void disband(String leader);
 
@@ -61,6 +73,10 @@ public interface IFaction {
   void removeCrystals(double crystals);
 
   MiniatureMap<Integer, Relation> getRelations();
+
+  MiniatureList<PendingInvitation> getInvitations();
+
+  int removeExpiredInvitations();
 
   List<UUID> getMembersUUID();
 

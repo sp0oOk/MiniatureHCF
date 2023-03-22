@@ -7,8 +7,10 @@ import org.bukkit.ChatColor;
 @SuppressWarnings("unused")
 public enum Role {
   LEADER(0, "Leader", ChatColor.RED),
-  OFFICER(1, "Officer", ChatColor.GOLD),
-  MEMBER(2, "Member", ChatColor.YELLOW);
+  CAPTAIN(1, "Captain", ChatColor.DARK_RED),
+  OFFICER(2, "Officer", ChatColor.GOLD),
+  MEMBER(3, "Member", ChatColor.YELLOW),
+  RECRUIT(4, "Recruit", ChatColor.GREEN);
 
   // ----------------------------------------- //
   // FIELDS

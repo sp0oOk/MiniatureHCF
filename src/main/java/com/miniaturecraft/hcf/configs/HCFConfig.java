@@ -12,10 +12,25 @@ public class HCFConfig {
   // GENERAL OPTIONS
   // ----------------------------------------- //
 
+  public String teleportationMoveMessage = "&cYou have moved, teleportation cancelled.";
+
+  public String factionHomeSet = "&aYou have set your faction home to your current location.";
+  public String factionHomeNotSet = "&cYour faction does not have a home set.";
+  public String factionHomeTeleporting =
+      "&eTeleporting to your faction home in &6{teleport_time} &eseconds.";
+  public String factionHomeTeleported = "&aYou have been teleported to your faction home.";
+  public int factionHomeTeleportSeconds = 5;
+
+  public String factionDoesNotExist = "&cThat faction doesn't exist!";
   public String factionExists = "&cA faction with that name already exists.";
   public String factionCreated = "&aYou have created the faction &e{faction_name}&a.";
   public String factionAlreadyInFaction = "&cYou are already in a faction.";
   public String fBypassMessage = "&eYou {is_bypassing} &eadamin bypassing.";
+
+  // ----------------------------------------- //
+  // INVITATION OPTIONS
+  // ----------------------------------------- //
+  public int factionExpireInvitationSeconds = 60 * 60 * 24 * 7;
 
   // ----------------------------------------- //
   // DEFAULT SYSTEM FACTIONS (DO NOT TOUCH)

@@ -104,6 +104,11 @@ public class FactionsConfig {
     return faction;
   }
 
+  /** Returns all loaded factions */
+  public MiniatureList<Faction> getAllFactions() {
+    return factions;
+  }
+
   /**
    * Deletes a faction
    *

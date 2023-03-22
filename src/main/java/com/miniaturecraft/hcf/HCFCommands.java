@@ -3,12 +3,14 @@ package com.miniaturecraft.hcf;
 import com.miniaturecraft.hcf.enums.Role;
 import com.miniaturecraft.hcf.objects.Faction;
 import com.miniaturecraft.hcf.objects.FactionParticipator;
+import com.miniaturecraft.hcf.tasks.TeleportationTask;
 import com.miniaturecraft.miniaturecore.commands.CommandArgs;
 import com.miniaturecraft.miniaturecore.enums.Requirement;
 import com.miniaturecraft.miniaturecore.interfaces.commands.Arg;
 import com.miniaturecraft.miniaturecore.interfaces.commands.Command;
 import com.miniaturecraft.miniaturecore.interfaces.commands.SubCommand;
 import com.miniaturecraft.miniaturecore.objects.ParsedPlaceholders;
+import com.miniaturecraft.miniaturecore.objects.QL;
 import com.miniaturecraft.miniaturecore.requirements.TypeRequirement;
 import com.miniaturecraft.miniaturecore.utils.Txt;
 import org.bukkit.command.CommandSender;
@@ -91,6 +93,58 @@ public class HCFCommands {
 
     // Send a message to the sender. (Faction created)
     sender.sendMessage(placeholders.parse(HCF.get().getConf().factionCreated));
+  }
+
+  @SubCommand(
+      name = "home",
+      description = "Teleports you to your faction's home.",
+      permission = "hcf.command.faction.home",
+      requirements = {Requirement.IS_PLAYER})
+  public void onCommandHome(CommandSender sender, CommandArgs args) {
+    final Player player = (Player) sender;
+    final FactionParticipator participator = HCF.get().getFactionsHandler().getPlayer(player);
+
+    if (!participator.getFaction().isPresent()) {
+      sender.sendMessage(Txt.parse(HCF.get().getConf().factionDoesNotExist));
+      return;
+    }
+
+    final Faction faction = participator.getFaction().get();
+
+    if (!faction.getHome().isPresent()) {
+      sender.sendMessage(Txt.parse(HCF.get().getConf().factionHomeNotSet));
+      return;
+    }
+
+    new TeleportationTask(
+            player,
+            faction.getHome().get(),
+            HCF.get().getConf().factionHomeTeleportSeconds,
+            Txt.parse(HCF.get().getConf().factionHomeTeleported))
+        .runTaskTimer(HCF.get(), 0L, 20L);
+
+    player.sendMessage(Txt.parse(HCF.get().getConf().factionHomeTeleporting));
+  }
+
+  @SubCommand(
+      name = "sethome",
+      description = "Sets your faction's home.",
+      permission = "hcf.command.faction.sethome",
+      requirements = {Requirement.IS_PLAYER})
+  public void onCommandSetHome(CommandSender sender, CommandArgs args) {
+    final Player player = (Player) sender;
+    final FactionParticipator participator = HCF.get().getFactionsHandler().getPlayer(player);
+    final Faction faction;
+
+    if ((faction = participator.getFaction().orElse(null)) == null) {
+      sender.sendMessage(Txt.parse(HCF.get().getConf().factionDoesNotExist));
+      return;
+    }
+
+    // TODO: Reminder, do role checks/permission system and land check!
+
+    faction.setHome(QL.valueOf(player.getLocation()));
+    player.sendMessage(Txt.parse(HCF.get().getConf().factionHomeSet));
   }
 
   /**

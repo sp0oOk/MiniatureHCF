@@ -1,12 +1,14 @@
 package com.miniaturecraft.hcf.objects;
 
 import com.miniaturecraft.hcf.HCF;
+import com.miniaturecraft.hcf.enums.ClaimResult;
 import com.miniaturecraft.hcf.enums.Relation;
 import com.miniaturecraft.hcf.enums.Role;
 import com.miniaturecraft.hcf.interfaces.IFaction;
 import com.miniaturecraft.miniaturecore.objects.MiniatureList;
 import com.miniaturecraft.miniaturecore.objects.MiniatureMap;
 import com.miniaturecraft.miniaturecore.objects.Pair;
+import com.miniaturecraft.miniaturecore.objects.QL;
 import lombok.Getter;
 import lombok.Setter;
 import org.bukkit.Bukkit;
@@ -28,13 +30,16 @@ public class Faction implements IFaction {
   private int id;
   private UUID leader;
   private String name;
+  private MiniatureList<QL> claims = MiniatureList.create();
+  private QL home;
   private String description;
   private boolean systemFaction;
   private int balance;
   private int points;
   private int kothsCaptured;
   private double crystals;
-  private List<Pair<UUID, Role>> members = MiniatureList.create();
+  private MiniatureList<PendingInvitation> pendingInvitations = MiniatureList.create();
+  private MiniatureList<Pair<UUID, Role>> members = MiniatureList.create();
   private MiniatureMap<Integer, Relation> relations = MiniatureMap.create();
   private double dtr;
 
@@ -91,6 +96,43 @@ public class Faction implements IFaction {
   @Override
   public String description() {
     return description == null ? "No description" : description;
+  }
+
+  /** Returns the faction claims. */
+  @Override
+  public MiniatureList<QL> getClaims() {
+    return claims;
+  }
+
+  /**
+   * Checks if a location is claimed by the faction.
+   *
+   * @param location The location to check.
+   * @return True if the location is claimed by the faction.
+   */
+  @Override
+  public boolean isClaimed(QL location) {
+    // TODO: implement
+    return false;
+  }
+
+  /**
+   * Attempt to claim a location for the faction.
+   *
+   * @param location The location to claim.
+   * @param factionParticipator The faction participator claiming the location.
+   * @return The result of the claim.
+   */
+  @Override
+  public ClaimResult claim(QL location, FactionParticipator factionParticipator) {
+    // TODO implement
+    return null;
+  }
+
+  /** Returns the faction home. */
+  @Override
+  public Optional<QL> getHome() {
+    return Optional.ofNullable(home);
   }
 
   @Override
@@ -210,6 +252,25 @@ public class Faction implements IFaction {
   @Override
   public MiniatureMap<Integer, Relation> getRelations() {
     return relations;
+  }
+
+  /** Returns the faction pending invitations. */
+  @Override
+  public MiniatureList<PendingInvitation> getInvitations() {
+    return pendingInvitations;
+  }
+
+  /** Returns the amount of expired invitations. */
+  @Override
+  public int removeExpiredInvitations() {
+    int removed = 0;
+    for (PendingInvitation pendingInvitation : pendingInvitations) {
+      if (pendingInvitation.isExpired()) {
+        pendingInvitations.remove(pendingInvitation);
+        removed++;
+      }
+    }
+    return removed;
   }
 
   /** Returns the faction members UUIDs. */

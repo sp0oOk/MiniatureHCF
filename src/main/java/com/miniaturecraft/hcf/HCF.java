@@ -4,8 +4,10 @@ import com.miniaturecraft.hcf.configs.FactionsConfig;
 import com.miniaturecraft.hcf.configs.HCFConfig;
 import com.miniaturecraft.hcf.listeners.PlayerInteractingListener;
 import com.miniaturecraft.hcf.listeners.PlayerJQListener;
+import com.miniaturecraft.hcf.listeners.PlayerMovingListener;
 import com.miniaturecraft.hcf.scoreboards.ScoreboardManager;
 import com.miniaturecraft.miniaturecore.MiniaturePlugin;
+import com.miniaturecraft.miniaturecore.enums.ColorTheme;
 
 public class HCF extends MiniaturePlugin {
 
@@ -36,12 +38,14 @@ public class HCF extends MiniaturePlugin {
   @Override
   public void onEnableInner() {
     i = this;
+    setColorTheme(ColorTheme.DEFAULT_RED);
     hcfConfig = getConfig(HCFConfig.class);
     factionsConfig = getConfig(FactionsConfig.class);
     factionsConfig.createSystemFactions();
     scoreboardManager = new ScoreboardManager();
     registerListener(new PlayerJQListener());
     registerListener(new PlayerInteractingListener());
+    registerListener(new PlayerMovingListener());
   }
 
   /** Called when the plugin is disabled */
